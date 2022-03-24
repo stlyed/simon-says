@@ -1,0 +1,62 @@
+.app {
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    font-family: sans-serif;
+    padding: 0 2rem;
+}
+
+// components styles
+.button {
+    background: coral;
+    width: fit-content;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.1s ease-in-out;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(1);
+    }
+}
+
+.squareItem {
+    width: 12rem;
+    height: 12rem;
+    border-radius: 0.75rem;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;    opacity: 0.6;
+
+    &:active {
+        opacity: 1;
+    }
+}
+
+// sections styles
+.nav {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    .title {
+        font-size: 3rem;
+    }
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    gap: 2rem;
+    * {
+        font-weight: 300;
+    }
+
+    .squares {
+        display: flex;
+        gap: 1rem;
+    }
+}
