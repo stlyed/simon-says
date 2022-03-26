@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./.module.scss";
 
-const Slider = ({ className, max, min = 0, value, onChange, index }) => {
+const Slider = ({ className, max, min = 0, value, onChange, name }) => {
     return (
         <input
             type="range"
@@ -10,7 +10,7 @@ const Slider = ({ className, max, min = 0, value, onChange, index }) => {
             value={value}
             className={`${className} ${styles.slider}`}
             onChange={onChange}
-            data-index={index}
+            data-name={name}
         />
     );
 };

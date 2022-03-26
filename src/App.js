@@ -16,7 +16,7 @@ const App = () => {
     /**
      * * Functions for the backend
      */
-    const [currentRound, setCurrentRound, currentRoundRef] = useState(0);
+    const [currentRound, setCurrentRound] = useState(0);
 
     const [showSettings, setShowSettings] = useState(false);
     const [settings] = useState(JSON.parse(localStorage.getItem("settings")));
@@ -131,6 +131,7 @@ const App = () => {
                         ))}
                     </div>
 
+                    {/* <Text>Time: {parseInt(getSetting("time").value)}s</Text> */}
                     <Text>Time: {parseInt(getSetting("time").value)}s</Text>
                     <Text>
                         Round: {currentRound} / {parseInt(getSetting("rounds").value)}
