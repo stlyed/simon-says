@@ -6,35 +6,6 @@
     padding: 0 2rem;
 }
 
-// components styles
-.button {
-    background: coral;
-    width: fit-content;
-    min-width: 8rem;
-    font-weight: 700 !important;
-    text-align: center;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: 0.1s ease-in-out;
-
-    &:active {
-        transform: scale(1);
-    }
-}
-
-.squareItem {
-    width: 12rem;
-    height: 12rem;
-    border-radius: 0.75rem;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;    
-    transition: all .1s ease-in-out;
-
-    &.activeSquare {
-        transform: scale(1.1);
-    }
-}
-
 // sections styles
 .nav {
     position: relative;

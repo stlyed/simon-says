@@ -4,10 +4,10 @@ import useState from "react-usestateref";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
-import styles from "./styles/styles.module.scss";
-import "./styles/styles.global.scss";
-import Settings from "./components/Settings";
+import Settings from "./layouts/Settings";
 import { AiFillHeart } from "react-icons/ai";
+import "./app.scss";
+import "./styles/styles.global.scss";
 
 const App = () => {
     const [, updateState] = useState();
@@ -52,9 +52,9 @@ const App = () => {
         const delay = ms => new Promise(res => setTimeout(res, ms));
         await delay(1500);
         for (const square of squareOrder) {
-            square.classList.add(styles.activeSquare);
+            square.classList.add("activeSquare");
             await delay(2000);
-            square.classList.remove(styles.activeSquare);
+            square.classList.remove("activeSquare");
             await delay(500);
         }
         setListening(true);
@@ -114,18 +114,18 @@ const App = () => {
     }, []);
 
     return (
-        <div className={styles.app}>
-            <nav className={styles.nav}>
-                <Text className={styles.title}>Memory Game!</Text>
+        <div className="app">
+            <nav className="nav">
+                <Text className="title">Memory Game!</Text>
                 <Button onClick={() => setShowSettings(!showSettings)}>Settings</Button>
-                <Settings className={`${styles.settings} ${showSettings ? "" : styles.hide}`} />
+                <Settings className={`settings ${showSettings ? "" : "hide"}`} />
             </nav>
-            <main className={styles.main}>
+            <main className='main'>
                 <Text>Welcome to the game! Repeat the pattern shown on screen!</Text>
 
                 <div className="info">
                     <Button onClick={() => start()}>{"Start"}</Button>
-                    <div className={styles.lives__container}>
+                    <div className='lives__container'>
                         {[...Array(parseInt(getSetting("lives").value))].map((e, index) => (
                             <Text key={index}>{<AiFillHeart />}</Text>
                         ))}
@@ -137,7 +137,7 @@ const App = () => {
                     </Text>
                 </div>
 
-                <div className={styles.squares}>
+                <div className='squares'>
                     {[...Array(parseInt(getSetting("squares").value))].map((item, index) => (
                         <Square
                             key={index}
@@ -145,9 +145,11 @@ const App = () => {
                             number={index}
                             onClick={handleClick}
                             onMouseDown={
-                                listeningRef.current ? e => e.target.classList.add(styles.activeSquare) : null
+                                listeningRef.current
+                                    ? e => e.target.classList.add('activeSquare')
+                                    : null
                             }
-                            onMouseUp={(e) => e.target.classList.remove(styles.activeSquare)}
+                            onMouseUp={e => e.target.classList.remove('activeSquare')}
                             color={squareColors[index]}
                         />
                     ))}

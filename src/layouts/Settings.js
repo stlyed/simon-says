@@ -1,41 +1,10 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
-import Button from "./Button";
-import Slider from "./Slider";
-import Text from "./Text";
+import Button from "../components/Button";
+import Slider from "../components/Slider";
+import Text from "../components/Text";
 import { defaultSettings } from "../data/defaultSettings";
 import { ImInfinite } from "react-icons/im";
-
-const SettingsStyles = styled.div`
-    border: 2px solid white;
-    width: 30rem;
-    height: 15rem;
-    padding: 1rem;
-    background: radial-gradient(rgb(110, 181, 184), rgb(40, 77, 78));
-
-    .settings__container {
-        margin-bottom: 1rem;
-        .setting {
-            display: grid;
-            grid-template-columns: 1fr 10px 1fr;
-            grid-gap: 1rem;
-            margin-bottom: 0.25rem;
-            .text {
-                text-align: right;
-                text-transform: capitalize;
-                font-weight: 300;
-            }
-            .value {
-                text-align: center;
-            }
-        }
-    }
-
-    .buttons {
-        display: flex;
-        justify-content: space-evenly;
-    }
-`;
+import './settings.scss'
 
 const Settings = ({ className }) => {
     const [, ForceUpdate] = useState(""); // When ever I need react to rerender, just setState with a random value
@@ -72,7 +41,7 @@ const Settings = ({ className }) => {
     }, []);
 
     return (
-        <SettingsStyles className={className}>
+        <div className={`${className} settings__section`}>
             <div className="settings__container">
                 {settings.map(({ name, max, min }, index) => (
                     <div className="setting" key={index}>
@@ -110,7 +79,7 @@ const Settings = ({ className }) => {
                     Reset To Default
                 </Button>
             </div>
-        </SettingsStyles>
+        </div>
     );
 };
 
