@@ -1,15 +1,16 @@
 import React from "react";
 import styles from "../styles/styles.module.scss";
 
-const Square = ({ onClick, onMouseDown, number, color }) => {
+const Square = ({ onClick, onMouseDown,onMouseUp, number, color, innerRef }) => {
     return (
         <div
             className={styles.squareItem}
+            ref={innerRef}
             onMouseDown={onMouseDown}
-            onMouseUp={(e) => e.target.classList.remove(styles.activeSquare)}
+            onMouseUp={onMouseUp}
             onClick={onClick}
-            data-number={number}
             style={{ background: color }}
+            data-number={number}
         ></div>
     );
 };

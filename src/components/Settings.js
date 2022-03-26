@@ -38,8 +38,8 @@ const SettingsStyles = styled.div`
 `;
 
 const Settings = ({ className }) => {
+    const [, ForceUpdate] = useState(""); // When ever I need react to rerender, just setState with a random value
     const [settings] = useState(JSON.parse(localStorage.getItem("settings")));
-    const [update, ForceUpdate] = useState(''); // When ever I need react to rerender, just setState with a random value
 
     const saveSettings = () => {
         localStorage.setItem("settings", JSON.stringify(settings));
@@ -68,6 +68,7 @@ const Settings = ({ className }) => {
         return () => {
             window.removeEventListener("storage");
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

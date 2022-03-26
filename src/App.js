@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback, useEffect, useRef } from "react";
+import useState from "react-usestateref";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
@@ -8,53 +10,48 @@ import Settings from "./components/Settings";
 import { AiFillHeart } from "react-icons/ai";
 
 const App = () => {
-    const [lives, setLives] = useState(3);
-    const [time, setTime] = useState(0);
-    const [round, setRound] = useState(0);
-    const [totalRounds, setTotalRounds] = useState(0);
-    const [listening, setListening] = useState(false);
+    const [, updateState] = useState();
+    const ForceUpdate = useCallback(() => updateState({}), []); // When ever I need react to rerender
 
-    const [totalSquares, setTotalSquares] = useState(0);
-    const [squareOrder] = useState([]);
-    const [playerOrder] = useState([]);
-    const [clickTracker, setClickTracker] = useState(0);
+    /**
+     * * Functions for the backend
+     */
+    const [currentRound, setCurrentRound, currentRoundRef] = useState(0);
 
     const [showSettings, setShowSettings] = useState(false);
-    const [colors] = useState(
-        Array(5)
+    const [settings] = useState(JSON.parse(localStorage.getItem("settings")));
+    const getSetting = index => settings.find(e => e.name === index);
+    const modifySetting = (settingName, newValue) => {
+        settings.forEach((element, index) => {
+            if (element.name === settingName) {
+                settings[index].value = newValue;
+            }
+        });
+    };
+
+    /**
+     * * Functions for the frontend
+     */
+    const squareRef = useRef([]);
+    const [squareColors] = useState(
+        Array(parseInt(getSetting("squares").value))
             .fill()
             .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16))
     );
-
-    const start = () => {
-        squareOrder.push(Math.floor(Math.random() * totalSquares));
-        animateSquares();
-    };
-
-    const reset = () => {
-        setListening(false);
-        const settings = JSON.parse(localStorage.getItem("settings"));
-        const getvalue = index => parseInt(settings.find(e => e.name === index).value);
-
-        setTotalSquares(getvalue("squares"));
-        setTotalRounds(getvalue("rounds"));
-        setTime(getvalue("time"));
-        setLives(getvalue("lives"));
-
-        setRound(0);
-        setClickTracker(0);
-        squareOrder.length = 0;
-        playerOrder.length = 0;
+    const [squareOrder] = useState([]);
+    const addSquare = () => {
+        const selectRandomSquare = Math.floor(
+            Math.random() * parseInt(getSetting("squares").value)
+        );
+        squareOrder.push(squareRef.current[selectRandomSquare]);
     };
 
     const animateSquares = async () => {
         setListening(false);
-        const delay = ms => new Promise(res => setTimeout(res, ms));
 
+        const delay = ms => new Promise(res => setTimeout(res, ms));
         await delay(1500);
-        // highlight all the square in the order they were chosen
-        for (const currentSquare of squareOrder) {
-            const square = document.querySelector(`[data-number='${currentSquare}']`);
+        for (const square of squareOrder) {
             square.classList.add(styles.activeSquare);
             await delay(2000);
             square.classList.remove(styles.activeSquare);
@@ -63,53 +60,58 @@ const App = () => {
         setListening(true);
     };
 
+    /**
+     * * Functions for the player
+     */
+    const [clickTracker, setClickTracker, clickTrackerRef] = useState(0);
+    const [, setListening, listeningRef] = useState(false);
     const handleClick = square => {
-        if (listening) {
-            if (squareOrder[clickTracker] === parseInt(square.target.dataset.number)) {
+        if (listeningRef.current) {
+            const lives = parseInt(getSetting("lives").value);
+            const correct = square.target === squareOrder[clickTrackerRef.current];
+            if (lives && correct) {
                 setClickTracker(clickTracker + 1);
-                playerOrder.push(square);
-
-                // if the user click all the things that simon said
-                if (squareOrder.length === playerOrder.length) {
-                    playerOrder.length = 0;
+                if (clickTrackerRef.current === squareOrder.length) {
+                    setCurrentRound(currentRound + 1);
                     setClickTracker(0);
-                    setRound(round + 1);
-                    squareOrder.push(Math.floor(Math.random() * totalSquares));
+                    addSquare();
                     animateSquares();
                 }
-                // if user click the wrong box
             } else {
-                setLives(lives - 1);
-                playerOrder.length = 0;
                 setClickTracker(0);
+                modifySetting("lives", parseInt(getSetting("lives").value - 1));
                 animateSquares();
             }
         }
     };
 
-    useEffect(() => {
-        // when the page loads
+    /**
+     * * Functions for the game
+     */
+    const start = () => {
         reset();
+        addSquare();
+        animateSquares();
+    };
 
-        // if settings are changed
-        window.addEventListener("storage", () => {
-            reset();
+    const reset = () => {
+        const newSettings = JSON.parse(localStorage.getItem("settings"));
+        newSettings.forEach((element, index) => {
+            settings[index] = element;
         });
+        setListening(false);
+        setClickTracker(0);
+        setCurrentRound(0);
+        ForceUpdate();
+    };
+
+    // get new settings
+    useEffect(() => {
+        window.addEventListener("storage", () => reset());
         return () => {
             window.removeEventListener("storage");
         };
     }, []);
-
-    // when player either wins or loses
-    useEffect(() => {
-        if (lives === 0) {
-            alert("you lost");
-            reset();
-        } else if (round === 8) {
-            alert("you won");
-            reset();
-        }
-    }, [round, lives]);
 
     return (
         <div className={styles.app}>
@@ -122,29 +124,31 @@ const App = () => {
                 <Text>Welcome to the game! Repeat the pattern shown on screen!</Text>
 
                 <div className="info">
-                    <Button onClick={() => start()}>{round === 0 ? "Start" : "Restart"}</Button>
+                    <Button onClick={() => start()}>{"Start"}</Button>
                     <div className={styles.lives__container}>
-                        {[...Array(lives)].map((e, index) => (
+                        {[...Array(parseInt(getSetting("lives").value))].map((e, index) => (
                             <Text key={index}>{<AiFillHeart />}</Text>
                         ))}
                     </div>
 
-                    <Text>Time: {time}s</Text>
+                    <Text>Time: {parseInt(getSetting("time").value)}s</Text>
                     <Text>
-                        Round: {round} / {totalRounds}
+                        Round: {currentRound} / {parseInt(getSetting("rounds").value)}
                     </Text>
                 </div>
 
                 <div className={styles.squares}>
-                    {[...Array(totalSquares)].map((item, index) => (
+                    {[...Array(parseInt(getSetting("squares").value))].map((item, index) => (
                         <Square
                             key={index}
+                            innerRef={e => squareRef.current.push(e)}
                             number={index}
-                            onClick={e => handleClick(e)}
+                            onClick={handleClick}
                             onMouseDown={
-                                listening ? e => e.target.classList.add(styles.activeSquare) : null
+                                listeningRef.current ? e => e.target.classList.add(styles.activeSquare) : null
                             }
-                            color={colors[index]}
+                            onMouseUp={(e) => e.target.classList.remove(styles.activeSquare)}
+                            color={squareColors[index]}
                         />
                     ))}
                 </div>
