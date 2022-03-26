@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import Slider from "../components/Slider";
