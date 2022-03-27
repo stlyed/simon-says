@@ -1,36 +1,29 @@
+export class Timer {
+    constructor(time) {
+        this.interval = null;
+        this.timeRemaining = time;
+    }
 
+    start() {
+        if (this.timeRemaining === 0) return;
+        this.interval = setInterval(() => {
+            this.timeRemaining--;
+            if (this.timeRemaining === 0) {
+                this.stop();
+            }
+        }, 1000);
+    }
 
-// (function () {
-//     let nativeSetTimeout = window.setTimeout;
+    stop() {
+        clearInterval(this.interval);
+        this.interval = null;
+    }
 
-//     window.bindTimeout = function (listener, interval) {
-//         function setTimeout(code, delay) {
-//             let elapsed = 0,
-//                 h;
+    setTime(time) {
+        this.timeRemaining = time;
+    }
 
-//             h = window.setInterval(function () {
-//                 elapsed += interval;
-//                 if (elapsed < delay) {
-//                     listener(delay - elapsed);
-//                 } else {
-//                     window.clearInterval(h);
-//                 }
-//             }, interval);
-//             return nativeSetTimeout(code, delay);
-//         }
-
-//         window.setTimeout = setTimeout;
-//         setTimeout._native = nativeSetTimeout;
-//     };
-
-//     window.clearTimeout = function () {
-//         // window.setTimeout = 0
-//     }
-// })();
-
-// window.bindTimeout(function (t) {
-//     console.log(parseInt(t.toString().slice(0, 2)));
-// }, 1000);
-// window.setTimeout(function () {
-//     console.log("All done.");
-// }, 30000);
+    getTime() {
+        return this.timeRemaining;
+    }
+}

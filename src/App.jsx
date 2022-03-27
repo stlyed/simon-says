@@ -12,7 +12,7 @@ import Settings from "./layouts/Settings";
 
 import "./app.scss";
 import "./styles/styles.global.scss";
-import { timer } from "./data/timer";
+import { Timer } from "./data/timer";
 
 const App = () => {
     const [, updateState] = useState();
@@ -36,10 +36,14 @@ const App = () => {
         // TODO: make sure game is stopped before opening settings
     };
 
-    const [, setTimneLeft, timeLeftRef] = useState(0);
+    const [timer] = useState(new Timer(getValue("time")));
+    const [showTimer, setShowTimer] = useState(timer.getTime())
+    // contininously update timer
     useEffect(() => {
-        
-    }, [() => inAnimationRef.current]);
+        setInterval(() => {
+            setShowTimer(timer.getTime())
+        }, 1000);
+    }, [])
 
     /**
      * * Functions for the frontend
@@ -71,6 +75,7 @@ const App = () => {
                 await delay(500);
             }
             setListening(true);
+            timer.start()
             setInAnimation(false);
         }
     };
@@ -106,8 +111,10 @@ const App = () => {
      */
     const [, setIsPlaying, isPlayingRef] = useState(0);
     const start = event => {
+        settingsRef.current.classList.add("hide");
+
         switch (isPlayingRef.current) {
-            // when window first load
+            // if it is your first time clicking start after the window loaded
             case 0:
                 reset();
                 addSquare();
@@ -122,11 +129,14 @@ const App = () => {
                 addSquare();
                 animateSquares();
         }
+        timer.setTime(getValue("time"));
         setIsPlaying(!isPlayingRef.current);
     };
 
     const reset = () => {
         setListening(false);
+        timer.stop()
+        timer.setTime(getValue('time'))
         setClickTracker(0);
         setCurrentRound(0);
         setLivesLeft(getValue("lives"));
@@ -138,7 +148,7 @@ const App = () => {
     // winning and losing
     useEffect(() => {
         if (isPlayingRef.current) {
-            if (livesLeftRef.current <= 0) {
+            if (livesLeftRef.current <= 0 || timer.getTime() === 0) {
                 alert("you lost");
                 setIsPlaying(false);
                 reset();
@@ -146,7 +156,7 @@ const App = () => {
                 alert("you won");
             }
         }
-    }, [currentRoundRef.current, livesLeftRef.current]);
+    }, [currentRoundRef.current, livesLeftRef.current, showTimer]);
 
     return (
         <div className="app">
@@ -176,9 +186,7 @@ const App = () => {
                         ))}
                     </div>
 
-                    <Text className="time">
-                        Time: {isInfinite("time") ? <ImInfinite /> : timeLeftRef.current + "s"}
-                    </Text>
+                    <Text className="time">Time: {isInfinite("time") ? <ImInfinite /> :  showTimer + "s"}</Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
                         {isInfinite("rounds") ? "" : " / " + getValue("rounds")}
