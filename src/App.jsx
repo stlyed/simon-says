@@ -24,12 +24,15 @@ const App = () => {
     const [, setCurrentRound, currentRoundRef] = useState(0);
     const [, setLivesLeft, livesLeftRef] = useState(getValue("lives"));
     const settingsRef = useRef(null);
+    const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
     const showSettings = () => {
         if (settingsRef.current.classList.contains("hide")) {
             settingsRef.current.classList.remove("hide");
+            setSettingsIsOpen(true);
         } else {
             settingsRef.current.classList.add("hide");
+            setSettingsIsOpen(false);
         }
         setIsPlaying(false);
         reset();
@@ -37,13 +40,13 @@ const App = () => {
     };
 
     const [timer] = useState(new Timer(getValue("time")));
-    const [showTimer, setShowTimer] = useState(timer.getTime())
+    const [showTimer, setShowTimer] = useState(timer.getTime());
     // contininously update timer
     useEffect(() => {
         setInterval(() => {
-            setShowTimer(timer.getTime())
+            setShowTimer(timer.getTime());
         }, 1000);
-    }, [])
+    }, []);
 
     /**
      * * Functions for the frontend
@@ -75,7 +78,7 @@ const App = () => {
                 await delay(500);
             }
             setListening(true);
-            timer.start()
+            timer.start();
             setInAnimation(false);
         }
     };
@@ -129,14 +132,15 @@ const App = () => {
                 addSquare();
                 animateSquares();
         }
+        setSettingsIsOpen(false);
         timer.setTime(getValue("time"));
         setIsPlaying(!isPlayingRef.current);
     };
 
     const reset = () => {
         setListening(false);
-        timer.stop()
-        timer.setTime(getValue('time'))
+        timer.stop();
+        timer.setTime(getValue("time"));
         setClickTracker(0);
         setCurrentRound(0);
         setLivesLeft(getValue("lives"));
@@ -162,7 +166,9 @@ const App = () => {
         <div className="app">
             <nav className="nav">
                 <Text className="title">Memory Game!</Text>
-                <Button onClick={showSettings}>Settings</Button>
+                <Button onClick={showSettings} className="settings__button">
+                    {settingsIsOpen ? "Cancel" : "Settings"}
+                </Button>
                 <Settings
                     className="hide settings"
                     innerRef={settingsRef}
@@ -186,7 +192,9 @@ const App = () => {
                         ))}
                     </div>
 
-                    <Text className="time">Time: {isInfinite("time") ? <ImInfinite /> :  showTimer + "s"}</Text>
+                    <Text className="time">
+                        Time: {isInfinite("time") ? <ImInfinite /> : showTimer + "s"}
+                    </Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
                         {isInfinite("rounds") ? "" : " / " + getValue("rounds")}

@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useCallback, useEffect } from "react";
 import { ImInfinite } from "react-icons/im";
 
 import { isInfinite, overhaulSettings, resetSettingsToDefault, settings } from "../data/settings";
@@ -13,7 +14,7 @@ const Settings = ({ className, innerRef, closeSettings }) => {
     const [, updateState] = useState();
     const ForceUpdate = useCallback(() => updateState({}), []);
 
-    const [tempSettings] = useState(settings());
+    const [tempSettings, setTempSettings] = useState(settings());
 
     const handleSlider = slider => {
         tempSettings.forEach((element, index) => {
@@ -26,13 +27,22 @@ const Settings = ({ className, innerRef, closeSettings }) => {
 
     const applySettings = () => {
         overhaulSettings(tempSettings);
-        closeSettings()
+        closeSettings();
     };
 
     const resetToDefaults = () => {
         resetSettingsToDefault();
-        closeSettings()
+        closeSettings();
     };
+
+    // show saved settings whenver the settings button is clicked
+    useEffect(() => {
+        window.onclick = e => {
+            if (e.target.classList.contains("settings__button")) {
+                setTempSettings(settings());
+            }
+        };
+    }, []);
 
     return (
         <div className={`${className} settings__section`} ref={innerRef}>
