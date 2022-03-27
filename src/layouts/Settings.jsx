@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useCallback, useEffect } from "react";
-import { ImInfinite } from "react-icons/im";
+import { FaInfinity } from "react-icons/fa";
 
 import { isInfinite, overhaulSettings, resetSettingsToDefault, settings } from "../data/settings";
 import Button from "../components/Button";
@@ -47,29 +47,32 @@ const Settings = ({ className, innerRef, closeSettings }) => {
     return (
         <div className={`${className} settings__section`} ref={innerRef}>
             <div className="settings__container">
-                {tempSettings.map(({ name, max, min, value }, index) => (
-                    <div className="setting" key={index}>
-                        <Text className="text">{name}</Text>
-                        <Text className="value">
-                            {isInfinite(name) ? (
-                                <ImInfinite />
-                            ) : (
-                                <>
-                                    {value < 10 ? 0 : ""}
-                                    {value}
-                                </>
-                            )}
-                        </Text>
-                        <Slider
-                            className="slider"
-                            name={name}
-                            max={max}
-                            min={min}
-                            onChange={handleSlider}
-                            value={value}
-                        />
-                    </div>
-                ))}
+                {tempSettings.map((element, index) => {
+                    const { name, max, min, value } = element;
+                    return (
+                        <div className="setting" key={index}>
+                            <Text className="text">{name}</Text>
+                            <Text className="value">
+                                {isInfinite(element) ? (
+                                    <FaInfinity />
+                                ) : (
+                                    <>
+                                        {value < 10 ? 0 : ""}
+                                        {value}
+                                    </>
+                                )}
+                            </Text>
+                            <Slider
+                                className="slider"
+                                name={name}
+                                max={max}
+                                min={min}
+                                onChange={handleSlider}
+                                value={value}
+                            />
+                        </div>
+                    );
+                })}
             </div>
             <div className="buttons">
                 <Button positive onClick={applySettings}>

@@ -22,8 +22,6 @@ export const resetSettingsToDefault = () => {
 };
 
 export const isInfinite = setting => {
-    const value = getValue(setting);
-    const max = parseInt(getSetting(setting).max);
-    // eslint-disable-next-line eqeqeq
-    return value == max && value.toString().slice(-1) == 1;
+    const { value, max } = typeof setting === 'object'? setting : getSetting(setting);
+    return parseInt(value) === parseInt(max) && value.toString().slice(-1) === "1";
 };

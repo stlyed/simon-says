@@ -193,7 +193,7 @@ const App = () => {
                     </div>
 
                     <Text className="time">
-                        Time: {isInfinite("time") ? <ImInfinite /> : showTimer + "s"}
+                        Time: {isInfinite("time") ? <ImInfinite className="infinity" /> : showTimer + "s"}
                     </Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
