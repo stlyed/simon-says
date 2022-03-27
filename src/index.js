@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { defaultSettings } from "./data/defaultSettings";
+import { resetSettingsToDefault } from "./data/Settings";
 
 // add settings to local storage
 if (!localStorage.getItem("settings")) {
-    localStorage.setItem("settings", JSON.stringify(defaultSettings));
+    resetSettingsToDefault()
 }
 
 ReactDOM.render(

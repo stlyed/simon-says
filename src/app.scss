@@ -44,7 +44,13 @@
     }
     .squares {
         display: flex;
+        justify-content: center;
         gap: 1rem;
         flex-wrap: wrap;
+        margin-bottom: 2rem;
+        .activeSquare {
+            transform: scale(1.1);
+        }
     }
 }
+

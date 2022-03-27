@@ -1,19 +1,5 @@
 const Identifier = "settings";
 
-export const settings = () => JSON.parse(localStorage.getItem(Identifier));
-
-export const getSetting = setting => settings().find(e => e.name === setting);
-
-export const changeSetting = (setting, value) => {
-    const tempSettings = settings();
-    tempSettings.forEach((element, index) => {
-        if (element.name === setting) {
-            tempSettings[index].value = value;
-            localStorage.setItem(Identifier, JSON.stringify(tempSettings));
-        }
-    });
-};
-
 export const defaultSettings = [
     { name: "volume", max: 10, value: 5 },
     { name: "rounds", max: 11, min: 1, value: 8 },
@@ -22,6 +8,17 @@ export const defaultSettings = [
     { name: "time", max: 61, min: 5, value: 30 },
 ];
 
-export const resetSettings = () => {
+export const settings = () => JSON.parse(localStorage.getItem(Identifier));
+
+export const getSetting = setting => settings().find(e => e.name === setting);
+
+export const overallSettings = (setting) => {
+    localStorage.setItem(Identifier, JSON.stringify(setting));
+}
+
+export const resetSettingsToDefault = () => {
     localStorage.setItem(Identifier, JSON.stringify(defaultSettings));
 };
+
+// eslint-disable-next-line eqeqeq
+export const isInfinite = (value, max) => value == max && value.toString().slice(-1) == 1;
