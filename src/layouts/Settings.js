@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { ImInfinite } from "react-icons/im";
 
-import { isInfinite, overallSettings, resetSettingsToDefault, settings } from "../data/Settings";
+import { isInfinite, overhaulSettings, resetSettingsToDefault, settings } from "../data/Settings";
 import Button from "../components/Button";
 import Slider from "../components/Slider";
 import Text from "../components/Text";
@@ -25,7 +25,7 @@ const Settings = ({ className, innerRef, closeSettings }) => {
     };
 
     const applySettings = () => {
-        overallSettings(tempSettings);
+        overhaulSettings(tempSettings);
         closeSettings()
     };
 
@@ -41,7 +41,7 @@ const Settings = ({ className, innerRef, closeSettings }) => {
                     <div className="setting" key={index}>
                         <Text className="text">{name}</Text>
                         <Text className="value">
-                            {isInfinite(value, max) ? (
+                            {isInfinite(name) ? (
                                 <ImInfinite />
                             ) : (
                                 <>

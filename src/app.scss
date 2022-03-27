@@ -35,6 +35,17 @@
         font-weight: 300;
     }
 
+    .info {
+        .time {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+        }
+        .infinity {
+            font-size: 1.5rem;
+        }
+    }
+
     .lives__container {
         display: flex;
         justify-content: flex-start;
@@ -45,7 +56,7 @@
     .squares {
         display: flex;
         justify-content: center;
-        gap: 1rem;
+        gap: 1.75rem;
         flex-wrap: wrap;
         margin-bottom: 2rem;
         .activeSquare {

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import useState from "react-usestateref";
 
-import { getSetting, isInfinite } from "./data/Settings";
+import { getSetting, getValue, isInfinite } from "./data/Settings";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
@@ -11,6 +11,7 @@ import Settings from "./layouts/Settings";
 
 import "./app.scss";
 import "./styles/styles.global.scss";
+import { ImInfinite } from "react-icons/im";
 
 const App = () => {
     const [, updateState] = useState();
@@ -20,7 +21,7 @@ const App = () => {
      * * Functions for the backend
      */
     const [, setCurrentRound, currentRoundRef] = useState(0);
-    const [, setLivesLeft, livesLeftRef] = useState(parseInt(getSetting("lives").value));
+    const [, setLivesLeft, livesLeftRef] = useState(getValue("lives"));
     const settingsRef = useRef(null);
 
     const showSettings = () => {
@@ -33,6 +34,9 @@ const App = () => {
         reset();
         // TODO: make sure game is stopped before opening settings
     };
+
+    const [, , timeLeftRef] = useState(getValue("time"));
+
     /**
      * * Functions for the frontend
      */
@@ -44,9 +48,7 @@ const App = () => {
     );
     const [squareOrder] = useState([]); // the order the computer highlighted each square
     const addSquare = () => {
-        const selectRandomSquare = Math.floor(
-            Math.random() * parseInt(getSetting("squares").value)
-        );
+        const selectRandomSquare = Math.floor(Math.random() * getValue("squares"));
         squareOrder.push(squareRef.current[selectRandomSquare]);
     };
 
@@ -57,7 +59,7 @@ const App = () => {
         while (inAnimationRef.current) {
             setListening(false);
             const delay = ms => new Promise(res => setTimeout(res, ms));
-            await delay(1500);
+            await delay(1000);
             for (const square of squareOrder) {
                 square.classList.add("activeSquare");
                 await delay(2000);
@@ -80,14 +82,16 @@ const App = () => {
             if (livesLeftRef.current && correct) {
                 setClickTracker(clickTracker + 1);
                 if (clickTrackerRef.current === squareOrder.length) {
-                    setCurrentRound(currentRoundRef.current + 1);
+                    setCurrentRound(
+                        isInfinite("rounds") ? currentRoundRef.current : currentRoundRef.current + 1
+                    );
                     setClickTracker(0);
                     addSquare();
                     animateSquares();
                 }
             } else {
                 setClickTracker(0);
-                setLivesLeft(livesLeftRef.current - 1);
+                setLivesLeft(isInfinite("lives") ? livesLeftRef.current : livesLeftRef.current - 1);
                 animateSquares();
             }
         }
@@ -121,7 +125,7 @@ const App = () => {
         setListening(false);
         setClickTracker(0);
         setCurrentRound(0);
-        setLivesLeft(parseInt(getSetting("lives").value));
+        setLivesLeft(getValue("lives"));
         squareOrder.length = 0;
         setInAnimation(true);
         ForceUpdate();
@@ -130,22 +134,12 @@ const App = () => {
     // winning and losing
     useEffect(() => {
         if (isPlayingRef.current) {
-            const infiniteRounds = isInfinite(
-                parseInt(getSetting("rounds").value),
-                parseInt(getSetting("rounds").max)
-            );
-            const lastRound = parseInt(getSetting("rounds").value) === currentRoundRef.current;
-            const infiniteLives = isInfinite(
-                parseInt(getSetting("lives").value),
-                parseInt(getSetting("lives").max)
-            );
-
-            if (!infiniteLives && livesLeftRef.current <= 0) {
+            if (livesLeftRef.current <= 0) {
                 alert("you lost");
                 setIsPlaying(false);
                 reset();
-            } else if (!infiniteRounds && lastRound) {
-                alert('you won')
+            } else if (getValue("rounds") === currentRoundRef.current) {
+                alert("you won");
             }
         }
     }, [currentRoundRef.current, livesLeftRef.current]);
@@ -178,9 +172,12 @@ const App = () => {
                         ))}
                     </div>
 
-                    <Text>Time: {parseInt(getSetting("time").value)}s</Text>
-                    <Text>
-                        Round: {currentRoundRef.current} / {parseInt(getSetting("rounds").value)}
+                    <Text className="time">
+                        Time: {isInfinite("time") ? <ImInfinite /> : timeLeftRef.current + "s"}
+                    </Text>
+                    <Text className="rounds">
+                        Round: {currentRoundRef.current}
+                        {isInfinite("rounds") ? "" : " / " + getValue("rounds")}
                     </Text>
                 </div>
 

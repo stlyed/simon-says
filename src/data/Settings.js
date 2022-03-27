@@ -11,14 +11,19 @@ export const defaultSettings = [
 export const settings = () => JSON.parse(localStorage.getItem(Identifier));
 
 export const getSetting = setting => settings().find(e => e.name === setting);
+export const getValue = setting => parseInt(getSetting(setting).value);
 
-export const overallSettings = (setting) => {
+export const overhaulSettings = setting => {
     localStorage.setItem(Identifier, JSON.stringify(setting));
-}
+};
 
 export const resetSettingsToDefault = () => {
     localStorage.setItem(Identifier, JSON.stringify(defaultSettings));
 };
 
-// eslint-disable-next-line eqeqeq
-export const isInfinite = (value, max) => value == max && value.toString().slice(-1) == 1;
+export const isInfinite = setting => {
+    const value = getValue(setting);
+    const max = parseInt(getSetting(setting).max);
+    // eslint-disable-next-line eqeqeq
+    return value == max && value.toString().slice(-1) == 1;
+};
