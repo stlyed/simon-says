@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useRef } from "react";
 import { AiFillHeart } from "react-icons/ai";
+import { ImInfinite } from "react-icons/im";
 import useState from "react-usestateref";
 
-import { getSetting, getValue, isInfinite } from "./data/Settings";
+import { getSetting, getValue, isInfinite } from "./data/settings";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
@@ -11,7 +12,7 @@ import Settings from "./layouts/Settings";
 
 import "./app.scss";
 import "./styles/styles.global.scss";
-import { ImInfinite } from "react-icons/im";
+import { timer } from "./data/timer";
 
 const App = () => {
     const [, updateState] = useState();
@@ -35,7 +36,10 @@ const App = () => {
         // TODO: make sure game is stopped before opening settings
     };
 
-    const [, , timeLeftRef] = useState(getValue("time"));
+    const [, setTimneLeft, timeLeftRef] = useState(0);
+    useEffect(() => {
+        
+    }, [() => inAnimationRef.current]);
 
     /**
      * * Functions for the frontend
@@ -52,7 +56,7 @@ const App = () => {
         squareOrder.push(squareRef.current[selectRandomSquare]);
     };
 
-    const [, setInAnimation, inAnimationRef] = useState(false);
+    const [, setInAnimation, inAnimationRef] = useState(0);
     const animateSquares = async () => {
         setInAnimation(true);
 
@@ -168,7 +172,7 @@ const App = () => {
                     </Button>
                     <div className="lives__container">
                         {[...Array(livesLeftRef.current)].map((e, index) => (
-                            <Text key={index}>{<AiFillHeart />}</Text>
+                            <Text key={index}>{<AiFillHeart className="heart" />}</Text>
                         ))}
                     </div>
 

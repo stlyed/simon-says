@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { ImInfinite } from "react-icons/im";
 
-import { isInfinite, overhaulSettings, resetSettingsToDefault, settings } from "../data/Settings";
+import { isInfinite, overhaulSettings, resetSettingsToDefault, settings } from "../data/settings";
 import Button from "../components/Button";
 import Slider from "../components/Slider";
 import Text from "../components/Text";
