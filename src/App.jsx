@@ -78,9 +78,9 @@ const App = () => {
                 square.classList.remove("activeSquare");
                 await delay(500);
             }
-            setListening(true);
             timer.setTime(getValue("time"));
             timer.start();
+            setListening(true);
             setInAnimation(false);
         }
     };
