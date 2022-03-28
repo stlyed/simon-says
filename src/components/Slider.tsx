@@ -1,7 +1,16 @@
-import React from "react";
+import { FC } from "react";
 import styles from "./.module.scss";
 
-const Slider = ({ className, max, min = 0, value, onChange, name }) => {
+interface slider {
+    onChange: (...args: any[]) => void;
+    name: string;
+    value: number;
+    max: number;
+    min?: number;
+    className?: string;
+}
+
+const Slider: FC<slider> = ({ className, max, min = 0, value, onChange, name }) => {
     return (
         <input
             type="range"

@@ -1,34 +1,53 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, FC } from "react";
 import { FaInfinity } from "react-icons/fa";
 
 import Button from "../components/Button";
 import Slider from "../components/Slider";
 import Text from "../components/Text";
 
-import "./settings.scss";
+import { Settings } from "../data/Settings";
 
-const Settings = ({ className, innerRef, settings, closeSettings }) => {
+import "./settingsMenu.scss";
+
+interface settings {
+    className: string;
+    innerRef: React.MutableRefObject<null>;
+    settings: Settings;
+    closeSettings: () => void;
+}
+
+const SettingsMenu: FC<settings> = ({ className, innerRef, settings, closeSettings }) => {
     // When ever I need react to rerender
-    const [, updateState] = useState();
+    const [, updateState] = useState<null | {}>();
     const ForceUpdate = useCallback(() => updateState({}), []);
 
     const [tempSettings, setTempSettings] = useState(settings.settings());
 
-    const handleSlider = slider => {
-        tempSettings.forEach((element, index) => {
-            if (element.name === slider.target.dataset.name) {
-                tempSettings[index].value = slider.target.value;
+    /**
+     * Temporary save the value that user is modifying
+     * @param slider The slider that the user is interacting with
+     */
+    const handleSlider = (slider: any) => {
+        tempSettings.forEach(({ name }, index) => {
+            if (name === slider.target.dataset.name) {
+                tempSettings[index].value = parseInt(slider.target.value);
             }
         });
         ForceUpdate();
     };
 
+    /**
+     * Change the value of the saved settings to the temporary ones
+     */
     const applySettings = () => {
         settings.newSettings(tempSettings);
         closeSettings();
     };
 
+    /**
+     * Change the value of the saved settings to be back to the defaults
+     */
     const resetToDefaults = () => {
         settings.resetToDefault();
         closeSettings();
@@ -36,8 +55,9 @@ const Settings = ({ className, innerRef, settings, closeSettings }) => {
 
     // show saved settings whenver the settings button is clicked
     useEffect(() => {
-        window.onclick = e => {
-            if (e.target.classList.contains("settings__button")) {
+        window.onclick = ({ target }) => {
+            // @ts-ignore: Property 'classList' does not exist on type 'EventTarget'
+            if (target.classList.contains("settings__button")) {
                 setTempSettings(settings.settings());
             }
         };
@@ -47,10 +67,9 @@ const Settings = ({ className, innerRef, settings, closeSettings }) => {
         <div className={`${className} settings__section`} ref={innerRef}>
             <div className="settings__container">
                 {tempSettings.map(({ name, max, min, value }, index) => {
-                    const isInfinity =
-                        parseInt(value) === parseInt(max) && value.toString().slice(-1) === "1";
-                    
-                        return (
+                    const isInfinity = value === max && value.toString().slice(-1) === "1";
+
+                    return (
                         <div className="setting" key={index}>
                             <Text className="text">{name}</Text>
                             <Text className="value">
@@ -87,4 +106,4 @@ const Settings = ({ className, innerRef, settings, closeSettings }) => {
     );
 };
 
-export default Settings;
+export default SettingsMenu;

@@ -1,7 +1,16 @@
-import React from "react";
+import { FC } from "react";
 import styles from "./.module.scss";
 
-const Square = ({ onClick, onMouseDown,onMouseUp, number, color, innerRef }) => {
+interface square {
+    onClick: (square: any) => void;
+    onMouseDown: (...args: any) => any;
+    onMouseUp: (...args: any) => any;
+    number: number
+    color: string
+    innerRef: any
+}
+
+const Square: FC<square> = ({ onClick, onMouseDown, onMouseUp, number, color, innerRef }) => {
     return (
         <div
             className={styles.squareItem}

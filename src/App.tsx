@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useRef } from "react";
+import { FC, useCallback, useEffect, useRef } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { ImInfinite } from "react-icons/im";
 import useState from "react-usestateref";
@@ -7,25 +7,38 @@ import useState from "react-usestateref";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
-import Settings from "./layouts/Settings";
+import SettingsMenu from "./layouts/SettingsMenu";
+
+import { Settings } from "./data/Settings";
+import { Timer } from "./data/timer";
 
 import "./app.scss";
 import "./styles/styles.global.scss";
-import { Timer } from "./data/timer";
 
-const App = ({ settings }) => {
-    const [, updateState] = useState();
-    const ForceUpdate = useCallback(() => updateState({}), []); // When ever I need react to rerender
+interface app {
+    settings: Settings;
+}
+
+const App: FC<app> = ({ settings }) => {
+    // When ever I need react to rerender call forceupdate
+    const [, updateState] = useState<null | {}>();
+    const ForceUpdate = useCallback(() => updateState({}), []);
 
     /**
      * * Functions for the backend
      */
+
     const [, setCurrentRound, currentRoundRef] = useState(0);
     const [, setHeartsLeft, heartsLeftRef] = useState(settings.getValueOf("hearts"));
     const settingsRef = useRef(null);
-    const [settingsIsOpen, setSettingsIsOpen] = useState(false);
+    const [settingsIsOpen, setSettingsIsOpen] = useState(false); // whether or not the settings menu is currently in view
 
-    const showSettings = () => {
+    /**
+     * Shows or hide the settings menu depending on if it is open already.
+     * 
+     * Also stops the game
+     */
+    const showSettings = (): void => {
         if (settingsRef.current.classList.contains("hide")) {
             settingsRef.current.classList.remove("hide");
             setSettingsIsOpen(true);
@@ -39,45 +52,51 @@ const App = ({ settings }) => {
     };
 
     const [timer] = useState(new Timer(settings.getValueOf("time")));
-    const [, setShowTimer, showTimerRef] = useState(timer.getTime());
+    const [, setShowTimer, showTimerRef] = useState(timer.timeRemaining);
     // contininously update timer
     useEffect(() => {
         setInterval(() => {
-            setShowTimer(timer.getTime());
+            setShowTimer(timer.timeRemaining);
         }, 1000);
     }, []);
 
     /**
      * * Functions for the frontend
      */
-    const squareRef = useRef([]);
+    
     const [squareColors] = useState(
-        Array(parseInt(settings.getParams("squares").max))
-            .fill()
-            .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16))
+        Array.from(
+            { length: settings.getParams("squares").max },
+            () => "#" + Math.floor(Math.random() * 16777215).toString(16)
+        )
     );
+    const squareRef = useRef([]);
     const [squareOrder] = useState([]); // the order the computer highlighted each square
     const addSquare = () => {
         const selectRandomSquare = Math.floor(Math.random() * settings.getValueOf("squares"));
         squareOrder.push(squareRef.current[selectRandomSquare]);
     };
 
-    const [, setInAnimation, inAnimationRef] = useState(0);
+    const [, setInAnimation, inAnimationRef] = useState<number | boolean>(0);
+
+    /**
+     * Animates the squares in the order that they were randomly chosen
+     */
     const animateSquares = async () => {
         setInAnimation(true);
 
         while (inAnimationRef.current) {
             timer.stop();
             setListening(false);
-            const delay = ms => new Promise(res => setTimeout(res, ms));
+            const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
             await delay(1000);
             for (const square of squareOrder) {
                 square.classList.add("activeSquare");
-                await delay(2000);
+                await delay(1000);
                 square.classList.remove("activeSquare");
-                await delay(500);
+                await delay(750);
             }
-            timer.setTime(settings.getValueOf("time"));
+            timer.timeRemaining = settings.getValueOf("time");
             timer.start();
             setListening(true);
             setInAnimation(false);
@@ -89,9 +108,17 @@ const App = ({ settings }) => {
      */
     const [, setListening, listeningRef] = useState(false); // wheter or not to count when the player click on a square
     const [clickTracker, setClickTracker, clickTrackerRef] = useState(0); // number of times the player click on a square
-    const handleClick = square => {
+    
+    /**
+     * Check if the user clicked on the correct square.
+     * If they did then go to the next round,
+     * if they did not the restart this round
+     * 
+     * @param param0 The square the user clicked on
+     */
+    const handleClick = ({ target }: { target: any }) => {
         if (listeningRef.current) {
-            const correct = square.target === squareOrder[clickTrackerRef.current];
+            const correct = target === squareOrder[clickTrackerRef.current];
             if (heartsLeftRef.current && correct) {
                 setClickTracker(clickTracker + 1);
                 if (clickTrackerRef.current === squareOrder.length) {
@@ -111,8 +138,15 @@ const App = ({ settings }) => {
     /**
      * * Functions for the game
      */
-    const [, setIsPlaying, isPlayingRef] = useState(0);
-    const start = event => {
+    
+    const [, setIsPlaying, isPlayingRef] = useState<number | boolean>(0);
+
+    /**
+     * When the user clicks the start button
+     * make sure the settings menu is hidden,
+     * stop or start the game depending on if the game is already running
+     */
+    const start = () => {
         settingsRef.current.classList.add("hide");
 
         switch (isPlayingRef.current) {
@@ -132,14 +166,17 @@ const App = ({ settings }) => {
                 animateSquares();
         }
         setSettingsIsOpen(false);
-        timer.setTime(settings.getValueOf("time"));
+        timer.timeRemaining = settings.getValueOf("time");
         setIsPlaying(!isPlayingRef.current);
     };
 
+    /**
+     * Change all the settings back to the saved settings
+     */
     const reset = () => {
         setListening(false);
         timer.stop();
-        timer.setTime(settings.getValueOf("time"));
+        timer.timeRemaining = settings.getValueOf("time");
         setClickTracker(0);
         setCurrentRound(0);
         setHeartsLeft(settings.getValueOf("hearts"));
@@ -170,7 +207,7 @@ const App = ({ settings }) => {
                 <Button onClick={showSettings} className="settings__button">
                     {settingsIsOpen ? "Cancel" : "Settings"}
                 </Button>
-                <Settings
+                <SettingsMenu
                     className="hide settings"
                     innerRef={settingsRef}
                     settings={settings}
@@ -227,7 +264,9 @@ const App = ({ settings }) => {
                     </Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
-                        {settings.getValueOf("rounds") === Infinity ? "" : " / " + settings.getValueOf("rounds")}
+                        {settings.getValueOf("rounds") === Infinity
+                            ? ""
+                            : " / " + settings.getValueOf("rounds")}
                     </Text>
                 </div>
 
@@ -235,14 +274,10 @@ const App = ({ settings }) => {
                     {[...Array(settings.getValueOf("squares"))].map((item, index) => (
                         <Square
                             key={index}
-                            innerRef={e => squareRef.current.push(e)}
+                            innerRef={(e: any) => squareRef.current.push(e)}
                             number={index}
                             onClick={handleClick}
-                            onMouseDown={
-                                listeningRef.current
-                                    ? e => e.target.classList.add("activeSquare")
-                                    : null
-                            }
+                            onMouseDown={e => e.target.classList.add("activeSquare")}
                             onMouseUp={e => e.target.classList.remove("activeSquare")}
                             color={squareColors[index]}
                         />
