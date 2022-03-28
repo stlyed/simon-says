@@ -4,7 +4,6 @@ import { AiFillHeart } from "react-icons/ai";
 import { ImInfinite } from "react-icons/im";
 import useState from "react-usestateref";
 
-import { getSetting, getValue } from "./data/settings";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
@@ -14,7 +13,7 @@ import "./app.scss";
 import "./styles/styles.global.scss";
 import { Timer } from "./data/timer";
 
-const App = () => {
+const App = ({ settings }) => {
     const [, updateState] = useState();
     const ForceUpdate = useCallback(() => updateState({}), []); // When ever I need react to rerender
 
@@ -22,7 +21,7 @@ const App = () => {
      * * Functions for the backend
      */
     const [, setCurrentRound, currentRoundRef] = useState(0);
-    const [, setHeartsLeft, heartsLeftRef] = useState(getValue("hearts"));
+    const [, setHeartsLeft, heartsLeftRef] = useState(settings.getValueOf("hearts"));
     const settingsRef = useRef(null);
     const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
@@ -39,7 +38,7 @@ const App = () => {
         // TODO: make sure game is stopped before opening settings
     };
 
-    const [timer] = useState(new Timer(getValue("time")));
+    const [timer] = useState(new Timer(settings.getValueOf("time")));
     const [, setShowTimer, showTimerRef] = useState(timer.getTime());
     // contininously update timer
     useEffect(() => {
@@ -53,13 +52,13 @@ const App = () => {
      */
     const squareRef = useRef([]);
     const [squareColors] = useState(
-        Array(parseInt(getSetting("squares").max))
+        Array(parseInt(settings.getParams("squares").max))
             .fill()
             .map(() => "#" + Math.floor(Math.random() * 16777215).toString(16))
     );
     const [squareOrder] = useState([]); // the order the computer highlighted each square
     const addSquare = () => {
-        const selectRandomSquare = Math.floor(Math.random() * getValue("squares"));
+        const selectRandomSquare = Math.floor(Math.random() * settings.getValueOf("squares"));
         squareOrder.push(squareRef.current[selectRandomSquare]);
     };
 
@@ -78,7 +77,7 @@ const App = () => {
                 square.classList.remove("activeSquare");
                 await delay(500);
             }
-            timer.setTime(getValue("time"));
+            timer.setTime(settings.getValueOf("time"));
             timer.start();
             setListening(true);
             setInAnimation(false);
@@ -133,17 +132,17 @@ const App = () => {
                 animateSquares();
         }
         setSettingsIsOpen(false);
-        timer.setTime(getValue("time"));
+        timer.setTime(settings.getValueOf("time"));
         setIsPlaying(!isPlayingRef.current);
     };
 
     const reset = () => {
         setListening(false);
         timer.stop();
-        timer.setTime(getValue("time"));
+        timer.setTime(settings.getValueOf("time"));
         setClickTracker(0);
         setCurrentRound(0);
-        setHeartsLeft(getValue("hearts"));
+        setHeartsLeft(settings.getValueOf("hearts"));
         squareOrder.length = 0;
         setInAnimation(true);
         ForceUpdate();
@@ -156,7 +155,7 @@ const App = () => {
                 alert("you lost");
                 setIsPlaying(false);
                 reset();
-            } else if (getValue("rounds") === currentRoundRef.current) {
+            } else if (settings.getValueOf("rounds") === currentRoundRef.current) {
                 alert("you won");
                 setIsPlaying(false);
                 reset();
@@ -174,6 +173,7 @@ const App = () => {
                 <Settings
                     className="hide settings"
                     innerRef={settingsRef}
+                    settings={settings}
                     closeSettings={showSettings}
                 />
             </nav>
@@ -189,7 +189,7 @@ const App = () => {
                         {isPlayingRef.current ? "Stop" : "Start"}
                     </Button>
                     <div className="hearts__container">
-                        {getValue("hearts") === Infinity ? (
+                        {settings.getValueOf("hearts") === Infinity ? (
                             <div className="healthy__hearts__container">
                                 <Text>
                                     <AiFillHeart className="sick_heart" />
@@ -200,7 +200,7 @@ const App = () => {
                         ) : (
                             <>
                                 <div className="sick__hearts__container">
-                                    {[...Array(getValue("hearts"))].map((e, index) => (
+                                    {[...Array(settings.getValueOf("hearts"))].map((e, index) => (
                                         <Text key={index}>
                                             <AiFillHeart className="sick_heart" />
                                         </Text>
@@ -219,7 +219,7 @@ const App = () => {
 
                     <Text className="time">
                         Time:{" "}
-                        {getValue("time") === Infinity ? (
+                        {settings.getValueOf("time") === Infinity ? (
                             <ImInfinite className="infinity" />
                         ) : (
                             showTimerRef.current + "s"
@@ -227,12 +227,12 @@ const App = () => {
                     </Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
-                        {getValue("rounds") === Infinity ? "" : " / " + getValue("rounds")}
+                        {settings.getValueOf("rounds") === Infinity ? "" : " / " + settings.getValueOf("rounds")}
                     </Text>
                 </div>
 
                 <div className="squares">
-                    {[...Array(getValue("squares"))].map((item, index) => (
+                    {[...Array(settings.getValueOf("squares"))].map((item, index) => (
                         <Square
                             key={index}
                             innerRef={e => squareRef.current.push(e)}

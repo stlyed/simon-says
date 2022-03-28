@@ -1,26 +1,37 @@
-const Identifier = "settings";
+export class Settings {
+    get localStorageKey() {
+        return "settings";
+    }
 
-export const defaultSettings = [
-    { name: "volume", max: 10, value: 5 },
-    { name: "rounds", max: 11, min: 1, value: 8 },
-    { name: "hearts", max: 11, min: 1, value: 3 },
-    { name: "squares", max: 30, min: 3, value: 4 },
-    { name: "time", max: 61, min: 5, value: 30 },
-];
+    get settings() {
+        return () => JSON.parse(localStorage.getItem(this.localStorageKey));
+    }
 
-export const settings = () => JSON.parse(localStorage.getItem(Identifier));
+    get defaultSettings() {
+        return [
+            // { name: "volume", max: 10, value: 5 },
+            { name: "rounds", max: 11, min: 1, value: 8 },
+            { name: "hearts", max: 11, min: 1, value: 3 },
+            { name: "squares", max: 30, min: 3, value: 4 },
+            { name: "time", max: 61, min: 5, value: 30 },
+        ];
+    }
 
-export const getSetting = setting => settings().find(e => e.name === setting);
+    getParams(settingName) {
+        return this.settings().find(e => e.name === settingName);
+    }
 
-export const getValue = setting => {
-    const { value, max } = getSetting(setting);
-    return parseInt(value) === parseInt(max) ? Infinity : parseInt(value);
-};
+    getValueOf(settingName) {
+        const { value, max } = this.getParams(settingName);
+        const isInfinity = parseInt(value) === parseInt(max) && value.toString().slice(-1) === "1";
+        return isInfinity ? Infinity : parseInt(value);
+    }
 
-export const overhaulSettings = setting => {
-    localStorage.setItem(Identifier, JSON.stringify(setting));
-};
+    newSettings(settings) {
+        localStorage.setItem(this.localStorageKey, JSON.stringify(settings));
+    }
 
-export const resetSettingsToDefault = () => {
-    localStorage.setItem(Identifier, JSON.stringify(defaultSettings));
-};
+    resetToDefault() {
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this.defaultSettings));
+    }
+}

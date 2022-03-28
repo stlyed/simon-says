@@ -2,19 +2,18 @@
 import { useState, useCallback, useEffect } from "react";
 import { FaInfinity } from "react-icons/fa";
 
-import { overhaulSettings, resetSettingsToDefault, settings } from "../data/settings";
 import Button from "../components/Button";
 import Slider from "../components/Slider";
 import Text from "../components/Text";
 
 import "./settings.scss";
 
-const Settings = ({ className, innerRef, closeSettings }) => {
+const Settings = ({ className, innerRef, settings, closeSettings }) => {
     // When ever I need react to rerender
     const [, updateState] = useState();
     const ForceUpdate = useCallback(() => updateState({}), []);
 
-    const [tempSettings, setTempSettings] = useState(settings());
+    const [tempSettings, setTempSettings] = useState(settings.settings());
 
     const handleSlider = slider => {
         tempSettings.forEach((element, index) => {
@@ -26,12 +25,12 @@ const Settings = ({ className, innerRef, closeSettings }) => {
     };
 
     const applySettings = () => {
-        overhaulSettings(tempSettings);
+        settings.newSettings(tempSettings);
         closeSettings();
     };
 
     const resetToDefaults = () => {
-        resetSettingsToDefault();
+        settings.resetToDefault();
         closeSettings();
     };
 
@@ -39,7 +38,7 @@ const Settings = ({ className, innerRef, closeSettings }) => {
     useEffect(() => {
         window.onclick = e => {
             if (e.target.classList.contains("settings__button")) {
-                setTempSettings(settings());
+                setTempSettings(settings.settings());
             }
         };
     }, []);
