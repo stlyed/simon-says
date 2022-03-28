@@ -2,7 +2,7 @@ import { FC } from "react";
 import styles from "./.module.scss";
 
 interface button {
-    onClick: () => void;
+    onClick: (...args: any[]) => void;
     negative?: boolean | number;
     positive?: boolean | number;
     className?: string;

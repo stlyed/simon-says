@@ -15,9 +15,10 @@ interface settings {
     innerRef: React.MutableRefObject<null>;
     settings: Settings;
     closeSettings: () => void;
+    alertRef: React.MutableRefObject<null>;
 }
 
-const SettingsMenu: FC<settings> = ({ className, innerRef, settings, closeSettings }) => {
+const SettingsMenu: FC<settings> = ({ className, innerRef, alertRef, settings, closeSettings }) => {
     // When ever I need react to rerender
     const [, updateState] = useState<null | {}>();
     const ForceUpdate = useCallback(() => updateState({}), []);
@@ -42,6 +43,8 @@ const SettingsMenu: FC<settings> = ({ className, innerRef, settings, closeSettin
      */
     const applySettings = () => {
         settings.newSettings(tempSettings);
+        // @ts-ignore: Object is possibly 'null'
+        alertRef.current.textContent = "Settings saved succesfully!";
         closeSettings();
     };
 
@@ -49,7 +52,8 @@ const SettingsMenu: FC<settings> = ({ className, innerRef, settings, closeSettin
      * Change the value of the saved settings to be back to the defaults
      */
     const resetToDefaults = () => {
-        settings.resetToDefault();
+        settings.resetToDefault();// @ts-ignore: Object is possibly 'null'
+        alertRef.current.textContent = "Settings has been reset!";
         closeSettings();
     };
 

@@ -2,10 +2,9 @@ $liveLeft: rgba(255, 4, 4, 0.61);
 $livesLost: black;
 
 .app {
-    color: white;
+    display: relative;
     height: 100vh;
     width: 100vw;
-    font-family: sans-serif;
     padding: 0 2rem;
 }
 
@@ -14,7 +13,7 @@ $livesLost: black;
     position: relative;
     display: flex;
     justify-content: space-between;
-    margin: 2rem 0;
+    margin: 0 0 2rem;
     .title {
         font-size: 3rem;
     }
@@ -55,7 +54,7 @@ $livesLost: black;
                 .infinity {
                     font-size: unset;
                     color: $livesLost;
-                    margin: 0 1rem;
+                    margin: 0 .5rem;
                 }
             }
 

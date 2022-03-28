@@ -2,9 +2,9 @@ import { FC } from "react";
 import styles from "./.module.scss";
 
 interface square {
-    onClick: (square: any) => void;
-    onMouseDown: (...args: any) => any;
-    onMouseUp: (...args: any) => any;
+    onClick: (...args: any[]) => void;
+    onMouseDown: (...args: any[]) => void;
+    onMouseUp: (...args: any[]) => void;
     number: number
     color: string
     innerRef: any
