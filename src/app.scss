@@ -1,3 +1,6 @@
+$liveLeft: rgba(255, 4, 4, 0.61);
+$livesLost: black;
+
 .app {
     color: white;
     height: 100vh;
@@ -36,26 +39,44 @@
     }
 
     .info {
-        .heart {
+        .hearts__container {
+            position: relative;
+            margin-top: 1rem;
             font-size: 2rem;
+
+            .healthy__hearts__container,
+            .sick__hearts__container {
+                display: flex;
+                justify-content: flex-start;
+                gap: 0.5rem;
+                position: absolute;
+                top: 0;
+                left: 0;
+                .infinity {
+                    font-size: unset;
+                    color: $livesLost;
+                    margin: 0 1rem;
+                }
+            }
+
+            .healthy_heart {
+                color: $liveLeft;
+            }
+            .sick_heart {
+                color: $livesLost;
+            }
         }
         .time {
             display: flex;
             align-items: center;
-            gap: .25rem;
+            gap: 0.25rem;
+            margin-top: 4rem;
         }
         .infinity {
             font-size: 1.5rem;
         }
     }
 
-    .lives__container {
-        display: flex;
-        justify-content: flex-start;
-        gap: .5rem;
-        margin-top: 1rem;
-        color: red;
-    }
     .squares {
         display: flex;
         justify-content: center;
@@ -67,4 +88,3 @@
         }
     }
 }
-

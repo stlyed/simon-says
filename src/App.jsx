@@ -4,7 +4,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { ImInfinite } from "react-icons/im";
 import useState from "react-usestateref";
 
-import { getSetting, getValue, isInfinite } from "./data/settings";
+import { getSetting, getValue } from "./data/settings";
 import Square from "./components/Square";
 import Button from "./components/Button";
 import Text from "./components/Text";
@@ -22,7 +22,7 @@ const App = () => {
      * * Functions for the backend
      */
     const [, setCurrentRound, currentRoundRef] = useState(0);
-    const [, setLivesLeft, livesLeftRef] = useState(getValue("lives"));
+    const [, setHeartsLeft, heartsLeftRef] = useState(getValue("hearts"));
     const settingsRef = useRef(null);
     const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
@@ -40,7 +40,7 @@ const App = () => {
     };
 
     const [timer] = useState(new Timer(getValue("time")));
-    const [showTimer, setShowTimer] = useState(timer.getTime());
+    const [, setShowTimer, showTimerRef] = useState(timer.getTime());
     // contininously update timer
     useEffect(() => {
         setInterval(() => {
@@ -68,6 +68,7 @@ const App = () => {
         setInAnimation(true);
 
         while (inAnimationRef.current) {
+            timer.stop();
             setListening(false);
             const delay = ms => new Promise(res => setTimeout(res, ms));
             await delay(1000);
@@ -78,6 +79,7 @@ const App = () => {
                 await delay(500);
             }
             setListening(true);
+            timer.setTime(getValue("time"));
             timer.start();
             setInAnimation(false);
         }
@@ -91,19 +93,17 @@ const App = () => {
     const handleClick = square => {
         if (listeningRef.current) {
             const correct = square.target === squareOrder[clickTrackerRef.current];
-            if (livesLeftRef.current && correct) {
+            if (heartsLeftRef.current && correct) {
                 setClickTracker(clickTracker + 1);
                 if (clickTrackerRef.current === squareOrder.length) {
-                    setCurrentRound(
-                        isInfinite("rounds") ? currentRoundRef.current : currentRoundRef.current + 1
-                    );
+                    setCurrentRound(currentRoundRef.current + 1);
                     setClickTracker(0);
                     addSquare();
                     animateSquares();
                 }
             } else {
                 setClickTracker(0);
-                setLivesLeft(isInfinite("lives") ? livesLeftRef.current : livesLeftRef.current - 1);
+                setHeartsLeft(heartsLeftRef.current - 1);
                 animateSquares();
             }
         }
@@ -143,7 +143,7 @@ const App = () => {
         timer.setTime(getValue("time"));
         setClickTracker(0);
         setCurrentRound(0);
-        setLivesLeft(getValue("lives"));
+        setHeartsLeft(getValue("hearts"));
         squareOrder.length = 0;
         setInAnimation(true);
         ForceUpdate();
@@ -152,15 +152,17 @@ const App = () => {
     // winning and losing
     useEffect(() => {
         if (isPlayingRef.current) {
-            if (livesLeftRef.current <= 0 || timer.getTime() === 0) {
+            if (heartsLeftRef.current <= 0 || showTimerRef.current === 0) {
                 alert("you lost");
                 setIsPlaying(false);
                 reset();
             } else if (getValue("rounds") === currentRoundRef.current) {
                 alert("you won");
+                setIsPlaying(false);
+                reset();
             }
         }
-    }, [currentRoundRef.current, livesLeftRef.current, showTimer]);
+    }, [currentRoundRef.current, heartsLeftRef.current, showTimerRef.current]);
 
     return (
         <div className="app">
@@ -186,23 +188,51 @@ const App = () => {
                     >
                         {isPlayingRef.current ? "Stop" : "Start"}
                     </Button>
-                    <div className="lives__container">
-                        {[...Array(livesLeftRef.current)].map((e, index) => (
-                            <Text key={index}>{<AiFillHeart className="heart" />}</Text>
-                        ))}
+                    <div className="hearts__container">
+                        {getValue("hearts") === Infinity ? (
+                            <div className="healthy__hearts__container">
+                                <Text>
+                                    <AiFillHeart className="sick_heart" />
+                                    <ImInfinite className="infinity" />
+                                    <AiFillHeart className="sick_heart" />
+                                </Text>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="sick__hearts__container">
+                                    {[...Array(getValue("hearts"))].map((e, index) => (
+                                        <Text key={index}>
+                                            <AiFillHeart className="sick_heart" />
+                                        </Text>
+                                    ))}
+                                </div>
+                                <div className="healthy__hearts__container">
+                                    {[...Array(heartsLeftRef.current)].map((e, index) => (
+                                        <Text key={index}>
+                                            <AiFillHeart className="healthy_heart" />
+                                        </Text>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     <Text className="time">
-                        Time: {isInfinite("time") ? <ImInfinite className="infinity" /> : showTimer + "s"}
+                        Time:{" "}
+                        {getValue("time") === Infinity ? (
+                            <ImInfinite className="infinity" />
+                        ) : (
+                            showTimerRef.current + "s"
+                        )}
                     </Text>
                     <Text className="rounds">
                         Round: {currentRoundRef.current}
-                        {isInfinite("rounds") ? "" : " / " + getValue("rounds")}
+                        {getValue("rounds") === Infinity ? "" : " / " + getValue("rounds")}
                     </Text>
                 </div>
 
                 <div className="squares">
-                    {[...Array(parseInt(getSetting("squares").value))].map((item, index) => (
+                    {[...Array(getValue("squares"))].map((item, index) => (
                         <Square
                             key={index}
                             innerRef={e => squareRef.current.push(e)}
