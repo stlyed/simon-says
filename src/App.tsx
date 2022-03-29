@@ -173,12 +173,12 @@ const App: FC<app> = ({ settings }) => {
         const soundPlayer = new SoundPlayer(audio);
 
         while (true) {
-            if (inAnimationRef.current === true) {
+            if (listeningRef.current && isPlayingRef.current) {
                 alertPlayer("Wait your turn!");
             } else {
-                soundPlayer.play(
+                const volume = soundPlayer.play(
                     squareClickedRef.current.target.dataset.frequency,
-                    settings.getValueOf("volume") * 0.1,
+                    settings.getValueOf("volume") * 0.01,
                     "sine"
                 );
             }

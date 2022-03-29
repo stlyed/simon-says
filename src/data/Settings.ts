@@ -21,7 +21,7 @@ class Settings {
      * An array of all the default values for each setting
      */
     readonly defaultSettings = [
-        { name: "volume", max: 10, value: 5 },
+        { name: "volume", max: 100, value: 30 },
         { name: "rounds", max: 21, min: 1, value: 8 },
         { name: "hearts", max: 11, min: 1, value: 3 },
         { name: "squares", max: 30, min: 3, value: 4 },
