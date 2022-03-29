@@ -1,34 +1,54 @@
-.settings__section {
+.settings {
+    position: absolute;
+    top: 4rem;
+    right: 0;
+    z-index: 100;
+
     border: 2px solid white;
     padding: 2rem;
-    background: radial-gradient(rgb(179, 179, 179), rgb(104, 104, 104));
-}
+    background: radial-gradient(rgb(74, 186, 201), rgb(51, 125, 134));
 
-.settings__container {
-    margin-bottom: 1rem;
-    .setting {
-        display: grid;
-        grid-template-columns: 1fr 15px 1fr;
-        grid-gap: 1rem;
-        margin-bottom: 0.25rem;
-        font-size: 1rem;
-        .text {
-            text-align: right;
-            text-transform: capitalize;
-            font-weight: 300;
+    &.hide {
+        display: none;
+    }
+
+    .setting__items__container {
+        margin-bottom: 1rem;
+
+        .setting__item {
+            display: grid;
+            grid-template-columns: 1fr 15px 1fr;
+            grid-gap: 1rem;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+
+            .text {
+                text-align: right;
+                text-transform: capitalize;
+                font-weight: 300;
+            }
+            .value {
+                display: flex;
+                justify-content: center;
+            }
+            .slider {
+                margin: auto;
+            }
         }
-        .value {
-            display: flex;
-            justify-content: center;
-        }
-        .slider {
-            margin: auto;
-        }
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 2rem;
     }
 }
 
-.buttons {
-    display: flex;
-    justify-content: space-evenly;
-    gap: 2rem;
+
+@media (width < 550px) {
+    .settings {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80vw;
+    }
 }

@@ -50,14 +50,10 @@ $livesLost: black;
     .title {
         font-size: 3rem;
     }
-    .settings {
-        position: absolute;
-        top: 4rem;
-        right: 0;
 
-        &.hide {
-            display: none;
-        }
+    .button__container {
+        margin: auto;
+        margin-right: unset;
     }
 }
 

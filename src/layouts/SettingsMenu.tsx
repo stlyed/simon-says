@@ -46,7 +46,7 @@ const SettingsMenu: FC<settings> = props => {
     const applySettings = () => {
         settings.newSettings(tempSettings);
         // @ts-ignore: Object is possibly 'null'
-        alertUser("Settings saved succesfully!");
+        alertUser("Settings has changed!");
         closeSettings();
     };
 
@@ -70,13 +70,13 @@ const SettingsMenu: FC<settings> = props => {
     }, []);
 
     return (
-        <div className={`${className} settings__section`} ref={innerRef}>
-            <div className="settings__container">
+        <div className={`${className} settings`} ref={innerRef}>
+            <div className="setting__items__container">
                 {tempSettings.map(({ name, max, min, value }, index) => {
                     const isInfinity = value === max && value.toString().slice(-1) === "1";
 
                     return (
-                        <div className="setting" key={index}>
+                        <div className="setting__item" key={index}>
                             <Text className="text">{name}</Text>
                             <Text className="value">
                                 {isInfinity ? (

@@ -149,12 +149,12 @@ const App: FC<app> = ({ settings }) => {
         }
     };
 
-    const handleSquareMouseDown = ({target}: {target: any}) => {
-        target.classList.add("activeSquare")
+    const handleSquareMouseDown = ({ target }: { target: any }) => {
+        target.classList.add("activeSquare");
         if (isPlayingRef.current && !listeningRef.current) {
-            alertPlayer("Wait your turn!")
+            alertPlayer("Wait your turn!");
         }
-    }
+    };
 
     /**
      * * Functions for the game
@@ -236,9 +236,11 @@ const App: FC<app> = ({ settings }) => {
             <div className="app">
                 <nav className="nav">
                     <Text className="title">Memory Game!</Text>
-                    <Button onClick={showSettings} className="settings__button">
-                        {settingsIsOpen ? "Cancel" : "Settings"}
-                    </Button>
+                    <div className="button__container">
+                        <Button onClick={showSettings} className="settings__button">
+                            {settingsIsOpen ? "Cancel" : "Settings"}
+                        </Button>
+                    </div>
                     <SettingsMenu
                         className="hide settings"
                         innerRef={settingsRef}
@@ -311,7 +313,7 @@ const App: FC<app> = ({ settings }) => {
                                 key={index}
                                 innerRef={(e: any) => squareRef.current.push(e)}
                                 onClick={handleSquareClicks}
-                                onMouseDown={handleSquareMouseDown }
+                                onMouseDown={handleSquareMouseDown}
                                 onMouseUp={e => e.target.classList.remove("activeSquare")}
                                 color={squareColors[index]}
                             />
