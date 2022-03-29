@@ -1,4 +1,4 @@
-export class Timer {
+class Timer {
     private _interval: number | null;
     private _timeRemaining: number;
     private _callback: ((...args: any[]) => void) | null;
@@ -6,7 +6,7 @@ export class Timer {
     /**
      * Countdown timer, you give it a time and then you can start.
      * It will stop when the time comes or you can stop it ahead of time
-     * 
+     *
      * @param time How long to set the timer
      * @param callback function that get execute when timer stops by itself
      */
@@ -66,3 +66,5 @@ export class Timer {
         return this._timeRemaining;
     }
 }
+
+export default Timer;

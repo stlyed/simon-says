@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useState } from "react";
-import { Timer } from "../data/timer";
+import Timer from "../data/timer";
 
 import styles from "./.module.scss";
 

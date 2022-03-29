@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { Settings } from "./data/Settings";
+import Settings from "./data/Settings";
 
 const settings = new Settings();
 

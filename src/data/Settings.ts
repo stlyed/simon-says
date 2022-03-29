@@ -5,7 +5,7 @@ interface settingsParams {
     value: number;
 }
 
-export class Settings {
+class Settings {
     /**
      * The key value pair inside of local storage
      */
@@ -21,7 +21,7 @@ export class Settings {
      * An array of all the default values for each setting
      */
     readonly defaultSettings = [
-        // { name: "volume", max: 10, value: 5 },
+        { name: "volume", max: 10, value: 5 },
         { name: "rounds", max: 11, min: 1, value: 8 },
         { name: "hearts", max: 11, min: 1, value: 3 },
         { name: "squares", max: 30, min: 3, value: 4 },
@@ -63,3 +63,5 @@ export class Settings {
         localStorage.setItem(this.localStorageKey, JSON.stringify(this.defaultSettings));
     }
 }
+
+export default Settings

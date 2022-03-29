@@ -5,19 +5,21 @@ interface square {
     onClick: (...args: any[]) => void;
     onMouseDown: (...args: any[]) => void;
     onMouseUp: (...args: any[]) => void;
-    color: string
-    innerRef: any
+    color: string;
+    frequency: number;
+    innerRef: (e: any) => number;
 }
 
-const Square: FC<square> = ({ onClick, onMouseDown, onMouseUp, color, innerRef }) => {
+const Square: FC<square> = props => {
     return (
         <div
             className={styles.squareItem}
-            ref={innerRef}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onClick={onClick}
-            style={{ background: color }}
+            ref={props.innerRef}
+            onMouseDown={props.onMouseDown}
+            onMouseUp={props.onMouseUp}
+            onClick={props.onClick}
+            style={{ background: props.color }}
+            data-frequency={props.frequency}
         ></div>
     );
 };

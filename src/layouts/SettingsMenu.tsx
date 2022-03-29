@@ -6,7 +6,8 @@ import Button from "../components/Button";
 import Slider from "../components/Slider";
 import Text from "../components/Text";
 
-import { Settings } from "../data/Settings";
+import Settings from "../data/Settings";
+import { audio, SoundPlayer } from "../data/SoundPlayer";
 
 import "./settingsMenu.scss";
 
@@ -20,7 +21,7 @@ interface settings {
 
 const SettingsMenu: FC<settings> = props => {
     const { className, innerRef, alertUser, settings, closeSettings } = props;
-    
+
     // When ever I need react to rerender
     const [, updateState] = useState<null | {}>();
     const ForceUpdate = useCallback(() => updateState({}), []);
@@ -44,6 +45,8 @@ const SettingsMenu: FC<settings> = props => {
      * Change the value of the saved settings to the temporary ones
      */
     const applySettings = () => {
+        (new SoundPlayer(audio)).play(440.0, 0.8, "sine").stop(0.5)
+        
         settings.newSettings(tempSettings);
         // @ts-ignore: Object is possibly 'null'
         alertUser("Settings has changed!");

@@ -9,12 +9,13 @@ import Button from "./components/Button";
 import Text from "./components/Text";
 import SettingsMenu from "./layouts/SettingsMenu";
 
-import { Settings } from "./data/Settings";
-import { Timer } from "./data/timer";
+import Settings from "./data/Settings";
+import Timer from "./data/timer";
 
 import "./app.scss";
 import "./styles/styles.global.scss";
 import Alert from "./components/Alert";
+import { SoundPlayer, audio } from "./data/SoundPlayer";
 
 interface app {
     settings: Settings;
@@ -59,7 +60,6 @@ const App: FC<app> = ({ settings }) => {
         }
         setIsPlaying(false);
         reset();
-        // TODO: make sure game is stopped before opening settings
     };
 
     const [timer] = useState(new Timer(settings.getValueOf("time")));
@@ -81,20 +81,28 @@ const App: FC<app> = ({ settings }) => {
             () => "#" + Math.floor(Math.random() * 16777215).toString(16)
         )
     );
+    const [squareFrequencies] = useState(
+        Array.from({ length: settings.getParams("squares").max }, () =>
+            parseInt(
+                Number.parseFloat((Math.random() * (440 - 261 + 1) + 261).toString()).toFixed(2)
+            )
+        )
+    );
     const squareRef = useRef([]);
-    const [squareOrder] = useState([]); // the order the computer highlighted each square
+    const [animationPattern] = useState([]); // the order the computer highlighted each square
     const addSquare = () => {
         const selectRandomSquare = Math.floor(Math.random() * settings.getValueOf("squares"));
-        squareOrder.push(squareRef.current[selectRandomSquare]);
+        animationPattern.push(squareRef.current[selectRandomSquare]);
     };
 
     const [, setInAnimation, inAnimationRef] = useState<number | boolean>(0);
-
     /**
      * Animates the squares in the order that they were randomly chosen
      */
-    const animateSquares = async () => {
+
+    const showAnimationPattern = async () => {
         setInAnimation(true);
+        const soundPlayer = new SoundPlayer(audio);
 
         while (inAnimationRef.current) {
             timer.stop();
@@ -103,15 +111,24 @@ const App: FC<app> = ({ settings }) => {
             await delay(1000);
 
             // highligh each square in order
-            for (const square of squareOrder) {
-                square.classList.add("activeSquare");
-                await delay(1000);
-                square.classList.remove("activeSquare");
+            for (let square = 0; square < animationPattern.length; square++) {
+                animationPattern[square].classList.add("activeSquare");
+                soundPlayer
+                    .play(
+                        animationPattern[square].dataset.frequency,
+                        settings.getValueOf("volume") * 0.1,
+                        "sine"
+                    )
+                    .stop(0.75);
                 await delay(750);
+                animationPattern[square].classList.remove("activeSquare");
+
+                // wait if there is another square to show in the pattern
+                void (square !== animationPattern.length - 1 && (await delay(250)));
             }
 
             timer.timeRemaining = settings.getValueOf("time");
-            void(isPlayingRef.current && timer.start())
+            void (isPlayingRef.current && timer.start());
             setListening(true);
             setInAnimation(false);
         }
@@ -122,7 +139,6 @@ const App: FC<app> = ({ settings }) => {
      */
     const [, setListening, listeningRef] = useState(false); // wheter or not to count when the player click on a square
     const [clickTracker, setClickTracker, clickTrackerRef] = useState(0); // number of times the player click on a square
-
     /**
      * Check if the user clicked on the correct square.
      * If they did then go to the next round,
@@ -132,28 +148,44 @@ const App: FC<app> = ({ settings }) => {
      */
     const handleSquareClicks = ({ target }: { target: any }) => {
         if (listeningRef.current) {
-            const correct = target === squareOrder[clickTrackerRef.current];
+            const correct = target === animationPattern[clickTrackerRef.current];
             if (heartsLeftRef.current && correct) {
                 setClickTracker(clickTracker + 1);
-                if (clickTrackerRef.current === squareOrder.length) {
+                if (clickTrackerRef.current === animationPattern.length) {
                     setCurrentRound(currentRoundRef.current + 1);
                     setClickTracker(0);
                     addSquare();
-                    animateSquares();
+                    showAnimationPattern();
                 }
             } else {
                 setClickTracker(0);
                 setHeartsLeft(heartsLeftRef.current - 1);
-                animateSquares();
+                showAnimationPattern();
             }
         }
     };
 
-    const handleSquareMouseDown = ({ target }: { target: any }) => {
-        target.classList.add("activeSquare");
-        if (isPlayingRef.current && !listeningRef.current) {
-            alertPlayer("Wait your turn!");
+    // play the sound when user click and let go of a square
+    function* squareClickIter(): Iterator<null> {
+        const soundPlayer = new SoundPlayer(audio);
+
+        while (true) {
+            soundPlayer.play(
+                squareClickedRef.current.target.dataset.frequency,
+                settings.getValueOf("volume") * 0.1,
+                "sine"
+            );
+            yield;
+            soundPlayer.stop();
+            yield;
         }
+    }
+
+    const [, setSquareClicked, squareClickedRef] = useState<any>(null);
+    const [squareClick] = useState(squareClickIter());
+    const handleSquareEvents = (sqaure: any) => {
+        setSquareClicked(sqaure);
+        squareClick.next();
     };
 
     /**
@@ -176,18 +208,18 @@ const App: FC<app> = ({ settings }) => {
                 reset();
                 addSquare();
                 alertPlayer("Game Starting!");
-                animateSquares();
+                showAnimationPattern();
                 break;
             // game needs to be stop
             case true:
-                alertPlayer("Game is Stopping!");
+                alertPlayer("GameOver!");
                 reset();
                 break;
             // game needs to start
             default:
                 addSquare();
                 alertPlayer("Game Starting!");
-                animateSquares();
+                showAnimationPattern();
         }
         setSettingsIsOpen(false);
         timer.timeRemaining = settings.getValueOf("time");
@@ -204,7 +236,11 @@ const App: FC<app> = ({ settings }) => {
         setClickTracker(0);
         setCurrentRound(0);
         setHeartsLeft(settings.getValueOf("hearts"));
-        squareOrder.length = 0;
+        // make sure none of the squares are highlighted by the computer
+        animationPattern.forEach(element => {
+            element.classList.remove("activeSquare");
+        });
+        animationPattern.length = 0;
         setInAnimation(true);
         ForceUpdate();
     };
@@ -313,8 +349,9 @@ const App: FC<app> = ({ settings }) => {
                                 key={index}
                                 innerRef={(e: any) => squareRef.current.push(e)}
                                 onClick={handleSquareClicks}
-                                onMouseDown={handleSquareMouseDown}
-                                onMouseUp={e => e.target.classList.remove("activeSquare")}
+                                onMouseDown={handleSquareEvents}
+                                onMouseUp={handleSquareEvents}
+                                frequency={squareFrequencies[index]}
                                 color={squareColors[index]}
                             />
                         ))}
