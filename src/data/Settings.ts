@@ -9,7 +9,7 @@ export class Settings {
     /**
      * The key value pair inside of local storage
      */
-    readonly localStorageKey = "settings";
+    readonly localStorageKey = "memoryGame_Settings";
 
     /**
      * The most updated settings directly from local storage
