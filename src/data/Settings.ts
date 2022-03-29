@@ -22,7 +22,7 @@ class Settings {
      */
     readonly defaultSettings = [
         { name: "volume", max: 10, value: 5 },
-        { name: "rounds", max: 11, min: 1, value: 8 },
+        { name: "rounds", max: 21, min: 1, value: 8 },
         { name: "hearts", max: 11, min: 1, value: 3 },
         { name: "squares", max: 30, min: 3, value: 4 },
         { name: "time", max: 61, min: 5, value: 30 },
