@@ -5,6 +5,8 @@ $livesLost: black;
     .bg {
         animation: slide 5s ease-in-out infinite alternate;
         background-image: linear-gradient(-60deg, rgb(251, 255, 2) 5%, #09f 60%);
+        // background-image: radial-gradient( rgba(251, 255, 0, 0.507) 5%, #09f 60%);
+        background-image: radial-gradient( rgb(251, 255, 191) 5%, #09f 60%);
         bottom: 0;
         left: -50%;
         opacity: 0.5;
@@ -38,7 +40,6 @@ $livesLost: black;
     height: 100vh;
     width: 100vw;
     padding: 0 2rem;
-    opacity: 0.9;
 }
 
 // sections styles
