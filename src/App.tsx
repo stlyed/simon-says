@@ -111,7 +111,7 @@ const App: FC<app> = ({ settings }) => {
             }
 
             timer.timeRemaining = settings.getValueOf("time");
-            timer.start();
+            void(isPlayingRef.current && timer.start())
             setListening(true);
             setInAnimation(false);
         }
