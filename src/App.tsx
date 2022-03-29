@@ -35,7 +35,7 @@ const App: FC<app> = ({ settings }) => {
     const [settingsIsOpen, setSettingsIsOpen] = useState(false); // whether or not the settings menu is currently in view
 
     const alertRef = useRef(null);
-    const alertUser = (message: string): void => {
+    const alertPlayer = (message: string): void => {
         alertRef.current.textContent = message;
     };
 
@@ -46,7 +46,7 @@ const App: FC<app> = ({ settings }) => {
      */
     const showSettings = (): void => {
         if (isPlayingRef.current) {
-            alertUser("Stop the game to modify the settings");
+            alertPlayer("Stop the game to modify the settings");
             return;
         }
 
@@ -130,7 +130,7 @@ const App: FC<app> = ({ settings }) => {
      *
      * @param param0 The square the user clicked on
      */
-    const handleClick = ({ target }: { target: any }) => {
+    const handleSquareClicks = ({ target }: { target: any }) => {
         if (listeningRef.current) {
             const correct = target === squareOrder[clickTrackerRef.current];
             if (heartsLeftRef.current && correct) {
@@ -148,6 +148,13 @@ const App: FC<app> = ({ settings }) => {
             }
         }
     };
+
+    const handleSquareMouseDown = ({target}: {target: any}) => {
+        target.classList.add("activeSquare")
+        if (isPlayingRef.current && !listeningRef.current) {
+            alertPlayer("Wait your turn!")
+        }
+    }
 
     /**
      * * Functions for the game
@@ -168,18 +175,18 @@ const App: FC<app> = ({ settings }) => {
             case 0:
                 reset();
                 addSquare();
-                alertUser("Game Starting!");
+                alertPlayer("Game Starting!");
                 animateSquares();
                 break;
             // game needs to be stop
             case true:
-                alertUser("Game is Stopping!");
+                alertPlayer("Game is Stopping!");
                 reset();
                 break;
             // game needs to start
             default:
                 addSquare();
-                alertUser("Game Starting!");
+                alertPlayer("Game Starting!");
                 animateSquares();
         }
         setSettingsIsOpen(false);
@@ -237,7 +244,7 @@ const App: FC<app> = ({ settings }) => {
                         innerRef={settingsRef}
                         settings={settings}
                         closeSettings={showSettings}
-                        alertUser={alertUser}
+                        alertUser={alertPlayer}
                     />
                 </nav>
                 <main className="main">
@@ -303,8 +310,8 @@ const App: FC<app> = ({ settings }) => {
                             <Square
                                 key={index}
                                 innerRef={(e: any) => squareRef.current.push(e)}
-                                onClick={handleClick}
-                                onMouseDown={e => e.target.classList.add("activeSquare")}
+                                onClick={handleSquareClicks}
+                                onMouseDown={handleSquareMouseDown }
                                 onMouseUp={e => e.target.classList.remove("activeSquare")}
                                 color={squareColors[index]}
                             />
