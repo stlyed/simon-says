@@ -7,7 +7,6 @@ import Slider from "../components/Slider";
 import Text from "../components/Text";
 
 import Settings from "../data/Settings";
-import { audio, SoundPlayer } from "../data/SoundPlayer";
 
 import "./settingsMenu.scss";
 
@@ -44,9 +43,7 @@ const SettingsMenu: FC<settings> = props => {
     /**
      * Change the value of the saved settings to the temporary ones
      */
-    const applySettings = () => {
-        (new SoundPlayer(audio)).play(440.0, 0.8, "sine").stop(0.5)
-        
+    const applySettings = () => {        
         settings.newSettings(tempSettings);
         // @ts-ignore: Object is possibly 'null'
         alertUser("Settings has changed!");

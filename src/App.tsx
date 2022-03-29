@@ -127,8 +127,11 @@ const App: FC<app> = ({ settings }) => {
                 void (square !== animationPattern.length - 1 && (await delay(250)));
             }
 
-            timer.timeRemaining = settings.getValueOf("time");
-            void (isPlayingRef.current && timer.start());
+            timer.start(settings.getValueOf("time"), () => {
+                setIsPlaying(-1);
+                start();
+            });
+
             setListening(true);
             setInAnimation(false);
         }
@@ -208,22 +211,33 @@ const App: FC<app> = ({ settings }) => {
                 reset();
                 addSquare();
                 alertPlayer("Game Starting!");
+                setIsPlaying(true);
                 showAnimationPattern();
                 break;
             // game needs to be stop
             case true:
                 alertPlayer("GameOver!");
+                setIsPlaying(false);
                 reset();
+                break;
+            // game is automatically stop by timer
+            case -1:
+                setHeartsLeft(heartsLeftRef.current - 1);
+                timer.timeRemaining = settings.getValueOf("time");
+                if (heartsLeftRef.current > 0) {
+                    showAnimationPattern();
+                } else {
+                    setIsPlaying(false);
+                }
                 break;
             // game needs to start
             default:
                 addSquare();
                 alertPlayer("Game Starting!");
                 showAnimationPattern();
+                setIsPlaying(true);
         }
         setSettingsIsOpen(false);
-        timer.timeRemaining = settings.getValueOf("time");
-        setIsPlaying(!isPlayingRef.current);
     };
 
     /**
@@ -247,18 +261,16 @@ const App: FC<app> = ({ settings }) => {
 
     // winning and losing
     useEffect(() => {
-        if (isPlayingRef.current) {
-            if (heartsLeftRef.current <= 0 || showTimerRef.current === 0) {
-                alert("you lost");
-                setIsPlaying(false);
-                reset();
-            } else if (settings.getValueOf("rounds") === currentRoundRef.current) {
-                alert("you won");
-                setIsPlaying(false);
-                reset();
-            }
+        if (heartsLeftRef.current <= 0) {
+            alert("you lost");
+            setIsPlaying(false);
+            reset();
+        } else if (settings.getValueOf("rounds") === currentRoundRef.current) {
+            alert("you won");
+            setIsPlaying(false);
+            reset();
         }
-    }, [currentRoundRef.current, heartsLeftRef.current, showTimerRef.current]);
+    }, [currentRoundRef.current, heartsLeftRef.current]);
 
     return (
         <>
