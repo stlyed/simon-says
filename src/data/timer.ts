@@ -1,15 +1,16 @@
 export class Timer {
     private _interval: number | null;
     private _timeRemaining: number;
-    private _callback: (() => void) | null;
+    private _callback: ((...args: any[]) => void) | null;
 
     /**
      * Countdown timer, you give it a time and then you can start.
      * It will stop when the time comes or you can stop it ahead of time
+     * 
      * @param time How long to set the timer
-     * @param callback Callback function that get execute when timer stops by itself
+     * @param callback function that get execute when timer stops by itself
      */
-    constructor(time: number, callback: () => void = null) {
+    constructor(time: number = 0, callback: (...args: any[]) => void = null) {
         this._interval = null;
         this._timeRemaining = time;
         this._callback = callback;
@@ -22,7 +23,7 @@ export class Timer {
      *
      * @param callback This does accept a Callback function that get execute when timer stops by itself
      */
-    public start(time: number | undefined = null, callback: () => void = null): void {
+    public start(time: number | undefined = null, callback: (...args: any[]) => void = null): void {
         void (time && (this.timeRemaining = time));
         this._callback = callback;
 
@@ -30,10 +31,8 @@ export class Timer {
         this._interval = window.setInterval(() => {
             this._timeRemaining--;
             if (this._timeRemaining === 0) {
-                if (this._callback) {
-                    this._callback()
-                }
                 this.stop();
+                void (this._callback && this._callback());
             }
         }, 1000);
     }

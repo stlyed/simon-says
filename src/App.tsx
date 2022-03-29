@@ -35,6 +35,9 @@ const App: FC<app> = ({ settings }) => {
     const [settingsIsOpen, setSettingsIsOpen] = useState(false); // whether or not the settings menu is currently in view
 
     const alertRef = useRef(null);
+    const alertUser = (message: string): void => {
+        alertRef.current.textContent = message;
+    };
 
     /**
      * Shows or hide the settings menu depending on if it is open already.
@@ -42,6 +45,11 @@ const App: FC<app> = ({ settings }) => {
      * Also stops the game
      */
     const showSettings = (): void => {
+        if (isPlayingRef.current) {
+            alertUser("Stop the game to modify the settings");
+            return;
+        }
+
         if (settingsRef.current.classList.contains("hide")) {
             settingsRef.current.classList.remove("hide");
             setSettingsIsOpen(true);
@@ -160,15 +168,18 @@ const App: FC<app> = ({ settings }) => {
             case 0:
                 reset();
                 addSquare();
+                alertUser("Game Starting!");
                 animateSquares();
                 break;
             // game needs to be stop
             case true:
+                alertUser("Game is Stopping!");
                 reset();
                 break;
             // game needs to start
             default:
                 addSquare();
+                alertUser("Game Starting!");
                 animateSquares();
         }
         setSettingsIsOpen(false);
@@ -208,8 +219,13 @@ const App: FC<app> = ({ settings }) => {
 
     return (
         <>
+            <div className="background">
+                <div className="bg"></div>
+                <div className="bg bg2"></div>
+                <div className="bg bg3"></div>
+            </div>
             <Alert innerRef={alertRef}></Alert>
-            
+
             <div className="app">
                 <nav className="nav">
                     <Text className="title">Memory Game!</Text>
@@ -221,7 +237,7 @@ const App: FC<app> = ({ settings }) => {
                         innerRef={settingsRef}
                         settings={settings}
                         closeSettings={showSettings}
-                        alertRef={alertRef}
+                        alertUser={alertUser}
                     />
                 </nav>
                 <main className="main">
@@ -287,7 +303,6 @@ const App: FC<app> = ({ settings }) => {
                             <Square
                                 key={index}
                                 innerRef={(e: any) => squareRef.current.push(e)}
-                                number={index}
                                 onClick={handleClick}
                                 onMouseDown={e => e.target.classList.add("activeSquare")}
                                 onMouseUp={e => e.target.classList.remove("activeSquare")}
